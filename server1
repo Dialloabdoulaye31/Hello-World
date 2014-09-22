@@ -1,0 +1,91 @@
+//=============================================================================
+// includes memoria compartida
+#include <sys/shm.h>
+#include <iostream>
+
+//=============================================================================
+// System Includes
+//=============================================================================
+#include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
+
+#include <dc1394/conversions.h>
+#include <dc1394/control.h>
+#include <dc1394/utils.h>
+
+
+//=============================================================================
+// PGR Includes
+//=============================================================================
+#include "pgr_registers.h"
+#include "pgr_stereocam.h"
+#include "pnmutils.h"
+
+//=============================================================================
+
+
+//=============================================================================
+/*#include <opencv2/opencv.hpp>
+#include <opencv2/core/mat.hpp>*/
+
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include "opencv2/core/core.hpp"
+
+
+//Size of the shared memory
+#define SHMSZ    3686400
+//#define SHMSZ    1228800 // 1 image
+
+
+
+//using namespace cv;
+using namespace std;
+
+
+
+
+//=============================================================================
+// a simple function to write a .pgm file
+int
+writePgm( char* szFilename,
+unsigned char* pucBuffer,
+int	width,
+int	height )
+{
+  FILE* stream;
+  stream = fopen( szFilename, "wb" );
+  if( stream == NULL)
+  {
+     perror( "Can't open image file" );
+     return 1;
+  }
+
+  fprintf( stream, "P5\n%u %u 255\n", width, height );
+  fwrite( pucBuffer, width, height, stream );
+  fclose( stream );
+  return 0;
+}
+
+//=============================================================================
+// a simple function to write a .ppm file
+int
+writePpm( char* szFilename,
+unsigned char* pucBuffer,
+int	width,
+int	height )
+{
+  FILE* stream;
+  stream = fopen( szFilename, "wb" );
+  if( stream == NULL)
+  {
+     perror( "Can't open image file" );
+     return 1;
+  }
+
+  fprintf( stream, "P6\n%u %u 255\n", width, height );
+  fwrite( pucBuffer, 3*width, height, stream );
+  fclose( stream );
+  return 0;
+}
